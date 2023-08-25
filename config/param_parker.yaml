@@ -1,0 +1,40 @@
+deeplearning:
+  log:
+    end: 0
+    debug: 0
+    time: 0
+    test: 1
+    status: 1
+  display: 0
+  # 动静态判定半径
+  radius: 0.5
+  # 动静态判定帧率
+  diagconditon: 10
+  # 危险区域判定距离
+  distance: 3.0
+  # 危险区域判定角度
+  angle: 30
+  structure:
+    lidarDirection: true
+    # 导航激光 水平夹角/deg
+    lidarAngle: 0
+    # 导航激光
+    pose2Machine: [0.32, 0, 0.18]
+    # 双目镜头 - 导航激光
+    leftcamera2lidar: [0.1, 0.06, -0.1]
+    rightcamera2lidar: [0.1, -0.06, -0.1]
+    # 双目镜头 - tof
+    leftcamera2tof: [ 0.001, 0.0652, -0.050 ]
+    rightcamera2tof: [ 0.001, -0.0548, -0.050 ]
+    poseTof2Machine: [0.419, -0.0052, 0.130]
+    # 相机高度 双目 + 轮高/2
+    cameraHeight: 0.198
+    cameraAngle: 0
+    tofAngle: 16
+    tofHeight: 0.248
+  threshold: 0.5
+  timeMargin: 70
+  saveData:
+    Path: ""
+    checkObject: false
+  relocationConfThresh: 0.005
