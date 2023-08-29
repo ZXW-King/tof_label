@@ -14,6 +14,7 @@
 #include "config.h"
 #include "file.h"
 #include "utils.h"
+#include "sstream"
 
 
 #define EXIST(file) (access((file).c_str(), 0) == 0)
@@ -316,13 +317,33 @@ void DrawPoints(cv::Mat &image, const std::vector<cv::Point> &imagePoints
         }
     }
 }
+std::vector<std::string> split(const std::string &s, char delimiter) {
+    std::vector<std::string> parts;
+    std::istringstream ss(s);
+    std::string part;
+    while (std::getline(ss, part, delimiter)) {
+        parts.push_back(part);
+    }
+    return parts;
+}
 
-bool showTof(cv::Mat imageDisplay,std::vector<cv::Point> imagePoints, std::vector<int> depthValues,std::string fileName) {
+std::string getLastTwoPathParts(const std::string &path) {
+    std::vector<std::string> pathParts = split(path, '/');
+    std::string result;
+
+    if (pathParts.size() >= 2) {
+        result = pathParts[pathParts.size() - 2] + "/" + pathParts[pathParts.size() - 1] + "/";
+    }
+
+    return result;
+}
+bool showTof(cv::Mat imageDisplay,std::vector<cv::Point> imagePoints, std::vector<int> depthValues,std::string fileName,std::string inputDir) {
 
     DrawPoints(imageDisplay, imagePoints, depthValues);
     {
-        std::string imagePath = fileName;
-        std::string file = "/media/xin/data1/data/parker_data/2022_08_22/tof_label/test_remap/result_image_with_tof/" + imagePath;
+        std::string lastTwoParts = getLastTwoPathParts(inputDir);
+        std::string tofLabelPath = "/media/xin/data1/data/parker_data/tof_label/" + lastTwoParts;
+        std::string file = tofLabelPath + "result_image_with_tof/" + fileName;
         file_op::File::MkdirFromFile(file);
         cv::imwrite(file, imageDisplay);
 //        file = "result_image_with_tof_copy/" + imagePath;
@@ -332,7 +353,7 @@ bool showTof(cv::Mat imageDisplay,std::vector<cv::Point> imagePoints, std::vecto
         cv::Mat imageOut(imageDisplay.rows, imageDisplay.cols, CV_8UC3, cv::Scalar(0, 0, 0));
         DrawPoints(imageOut, imagePoints, depthValues);
 
-        file = "/media/xin/data1/data/parker_data/2022_08_22/tof_label/test_remap/result_tof/" + imagePath;
+        file = tofLabelPath + "result_tof/" + fileName;
         file_op::File::MkdirFromFile(file);
         cv::imwrite(file, imageOut);
     }
@@ -529,11 +550,13 @@ bool Remap(const CameraType type, cv::Mat &image,cv::Mat remapX,cv::Mat remapY)
     return true;
 }
 
+
+
 int main() {
 
     // 读取图像
     std::vector<SyncDataFile> dataset;
-    std::string inputDir = "/media/xin/data1/data/parker_data/2022_08_22/xiao/data_2023_0822_0"; //数据集路径
+    std::string inputDir = "/media/xin/data1/data/parker_data/2022_08_22/louti/data_2023_0822_2"; //数据集路径
     psl::CameraMoudleParam param;
     std::string cameraConfigFile = inputDir + "/config.yaml"; //相机配置文件路径
     GetCameraConfig(cameraConfigFile, param);  // 获取相机配置数据
@@ -603,7 +626,7 @@ int main() {
 
 
         std::string fileName = GetFileNameFromPath(item.imageLeft);
-        showTof(imageLeft,imagePoints, depthValues,fileName);
+        showTof(imageLeft,imagePoints, depthValues,fileName,inputDir);
     }
     return 0;
 }
