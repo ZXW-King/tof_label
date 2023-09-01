@@ -337,15 +337,13 @@ std::string getLastTwoPathParts(const std::string &path) {
 
     return result;
 }
-bool showTof(cv::Mat imageDisplay,std::vector<cv::Point> imagePoints, std::vector<int> depthValues,std::string fileName,std::string inputDir) {
+bool showTof(cv::Mat imageDisplay,std::vector<cv::Point> imagePoints, std::vector<int> depthValues,std::string result_image_with_tof_path,std::string result_tof_path) {
 
     DrawPoints(imageDisplay, imagePoints, depthValues);
     {
-        std::string lastTwoParts = getLastTwoPathParts(inputDir);
-        std::string tofLabelPath = "/media/xin/data1/data/parker_data/tof_label/" + lastTwoParts;
-        std::string file = tofLabelPath + "result_image_with_tof/" + fileName;
-        file_op::File::MkdirFromFile(file);
-        cv::imwrite(file, imageDisplay);
+
+        file_op::File::MkdirFromFile(result_image_with_tof_path);
+        cv::imwrite(result_image_with_tof_path, imageDisplay);
 //        file = "result_image_with_tof_copy/" + imagePath;
 //        file_op::File::MkdirFromFile(file);
 //        cv::imwrite(file, imageDisplay);
@@ -353,9 +351,8 @@ bool showTof(cv::Mat imageDisplay,std::vector<cv::Point> imagePoints, std::vecto
         cv::Mat imageOut(imageDisplay.rows, imageDisplay.cols, CV_8UC3, cv::Scalar(0, 0, 0));
         DrawPoints(imageOut, imagePoints, depthValues);
 
-        file = tofLabelPath + "result_tof/" + fileName;
-        file_op::File::MkdirFromFile(file);
-        cv::imwrite(file, imageOut);
+        file_op::File::MkdirFromFile(result_tof_path);
+        cv::imwrite(result_tof_path, imageOut);
     }
 
 //    imagePoints.clear();
@@ -557,6 +554,7 @@ int main() {
     // 读取图像
     std::vector<SyncDataFile> dataset;
     std::string inputDir = "/media/xin/data1/data/parker_data/2022_08_22/louti/data_2023_0822_2"; //数据集路径
+    std::string inputTofSaveDir = "/home/xin/Desktop/test_tof/"; //数据集路径
     psl::CameraMoudleParam param;
     std::string cameraConfigFile = inputDir + "/config.yaml"; //相机配置文件路径
     GetCameraConfig(cameraConfigFile, param);  // 获取相机配置数据
@@ -623,10 +621,10 @@ int main() {
 //        std::vector<Eigen::Vector3d> pointsSelectedDraw;
 //        std::vector<cv::Point> imagePointsDraw;
 
-
-
-        std::string fileName = GetFileNameFromPath(item.imageLeft);
-        showTof(imageLeft,imagePoints, depthValues,fileName,inputDir);
+        std::string lastTwoParts = getLastTwoPathParts(inputDir);
+        std::string result_image_with_tof_path = inputTofSaveDir + "result_image_with_tof/" + lastTwoParts + item.imageCam0;
+        std::string result_tof_path = inputTofSaveDir + "result_tof/" + lastTwoParts + item.imageCam0;
+        showTof(imageLeft,imagePoints, depthValues,result_image_with_tof_path,result_tof_path);
     }
     return 0;
 }
